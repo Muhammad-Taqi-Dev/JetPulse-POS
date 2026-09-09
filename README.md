@@ -1,4 +1,4 @@
-# ⚡ ApexPOS Enterprise — Smart Point of Sale & Invoice Generator
+﻿# ⚡ JetPulse POS — Smart Point of Sale, CRM & Real-Time Thermal Invoice Engine
 
 [![Oracle JET](https://img.shields.io/badge/Oracle%20JET-v21.0.0-F80000?logo=oracle&logoColor=white)](https://www.oracle.com/webfolder/technetwork/jet/index.html)
 [![Knockout.js](https://img.shields.io/badge/Knockout.js-MVVM-E44D26?logo=javascript&logoColor=white)](https://knockoutjs.com/)
@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/badge/License-UPL--1.0-blue.svg)](https://oss.oracle.com/licenses/upl/)
 [![Thermal Print Ready](https://img.shields.io/badge/Print-80mm%20Thermal%20Receipt-success?logo=espressif&logoColor=white)](#-5-80mm-thermal-tax-receipt-engine)
 
-**ApexPOS Enterprise** is a modern, enterprise-grade Point of Sale (POS), Customer Loyalty CRM, Multi-Tender Checkout Gateway, and Real-Time 80mm Thermal Invoice Generator web application. Built natively on **Oracle JavaScript Extension Toolkit (Oracle JET v21)** and **Knockout.js MVVM** architecture with **TypeScript** and modular **RequireJS AMD Web Components**.
+**JetPulse POS** is a modern, enterprise-grade Point of Sale (POS), Customer Loyalty CRM, Multi-Tender Checkout Gateway, and Real-Time 80mm Thermal Invoice Generator web application. Built natively on **Oracle JavaScript Extension Toolkit (Oracle JET v21)** and **Knockout.js MVVM** architecture with **TypeScript** and modular **RequireJS AMD Web Components**.
 
 ---
 
@@ -75,7 +75,7 @@
 
 ### 👥 6. Customer Directory & Automated CRM Sync (`/customers`)
 - **Automated POS Checkout Sync**:
-  - Whenever an order is completed with a customer name or phone number, ApexPOS checks the CRM directory.
+  - Whenever an order is completed with a customer name or phone number, JetPulse POS checks the CRM directory.
   - **Existing Customer**: Increments visit count (+1), accumulates total spend (+$grandTotal), updates last visit date, and awards **1 Loyalty Point per $1 spent**.
   - **Automatic Tier Upgrades**: Automatically recalculates and upgrades customer tiers based on lifetime spend:
     - 🔵 **Standard**: `$0 – $149`
@@ -101,7 +101,14 @@
 
 ---
 
-### 🌓 8. Unified Dark / Light Theme & UX Polish
+### ℹ️ 8. System Diagnostics & About Portal (`/about`)
+- **Live System Metric Pills**: Real-time counters for catalog products, recorded transactions, CRM profiles, and active cashier operators.
+- **Quick Launch Shortcuts**: Fast one-click navigation to POS Register, Order History, and Customers CRM.
+- **Framework & Architecture Showcase**: Comprehensive summary of Oracle JET v21 and Knockout.js MVVM reactivity.
+
+---
+
+### 🌓 9. Unified Dark / Light Theme & UX Polish
 - **Single Master Theme Toggle**: Seamless switch between Dark and Light mode from the top navbar with persistent preferences.
 - **Tailored Modern Typography**: Inter / Outfit sans-serif typeface stack with high-contrast readability.
 - **Custom Knockout Handlers**: `currency`, `pulseOnChange`, `stockBadge`, `numericOnly`.
@@ -118,8 +125,8 @@
 ### 1. Clone & Install Dependencies
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/JET_Web_Application.git
-cd JET_Web_Application
+git clone https://github.com/your-username/JetPulse-POS.git
+cd "JetPulse POS"
 
 # Install dependencies
 npm install
@@ -150,7 +157,7 @@ For an exhaustive technical breakdown of every class, service, MVVM binding, and
 👉 **[`CODEBASE_STRUCTURE.md`](./CODEBASE_STRUCTURE.md)**
 
 ```
-JET_Web_Application/
+JetPulse POS/
 ├── src/
 │   ├── css/
 │   │   ├── app.css                     # Unified design system, light/dark themes & print styles

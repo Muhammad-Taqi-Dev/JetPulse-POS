@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright (c) 2014, 2026, Oracle and/or its affiliates.
  * Licensed under The Universal Permissive License (UPL), Version 1.0
@@ -217,11 +217,11 @@ class RootViewModel {
     });
 
     // Header branding
-    this.appName = ko.observable("ApexPOS Enterprise");
+    this.appName = ko.observable("JetPulse POS");
 
     // Footer links
     this.footerLinks = [
-      { name: "ApexPOS Documentation", linkId: "aboutOracle", linkTarget: "#" },
+      { name: "JetPulse POS Documentation", linkId: "aboutOracle", linkTarget: "#" },
       { name: "Terminal Support", linkId: "contactUs", linkTarget: "#" },
       { name: "Legal Notices", linkId: "legalNotices", linkTarget: "#" },
       { name: "System Status: Online", linkId: "termsOfUse", linkTarget: "#" }

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright (c) 2014, 2026, Oracle and/or its affiliates.
  * Licensed under The Universal Permissive License (UPL), Version 1.0
@@ -145,7 +145,7 @@ class CustomersViewModel {
 
   connected(): void {
     AccUtils.announce("Customers & Loyalty page loaded.");
-    document.title = "Customers & Loyalty - ApexPOS Enterprise";
+    document.title = "Customers & Loyalty - JetPulse POS";
     this.loadCustomers();
   }
 

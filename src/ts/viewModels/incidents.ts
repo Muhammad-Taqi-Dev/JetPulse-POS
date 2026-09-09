@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright (c) 2014, 2026, Oracle and/or its affiliates.
  * Licensed under The Universal Permissive License (UPL), Version 1.0
@@ -82,7 +82,7 @@ class IncidentsViewModel {
 
   connected(): void {
     AccUtils.announce("Order History page loaded.");
-    document.title = "Order History - ApexPOS Enterprise";
+    document.title = "Order History - JetPulse POS";
     this.loadOrders();
   }
 

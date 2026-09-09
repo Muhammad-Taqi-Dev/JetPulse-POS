@@ -1,12 +1,12 @@
-# 📚 ApexPOS Enterprise — Codebase & Architecture Guide
+﻿# 📚 JetPulse POS — Codebase & Architecture Guide
 
-This document provides a comprehensive technical breakdown of the **ApexPOS Enterprise** codebase, detailing the file structure, MVVM pattern, reactive data flows, state management, and design conventions used in this **Oracle JET v21** and **Knockout.js** application.
+This document provides a comprehensive technical breakdown of the **JetPulse POS** codebase, detailing the file structure, MVVM pattern, reactive data flows, state management, and design conventions used in this **Oracle JET v21** and **Knockout.js** application.
 
 ---
 
 ## 1. High-Level Architecture Overview
 
-ApexPOS is structured as an **Enterprise Single Page Application (SPA)** following the **Model-View-ViewModel (MVVM)** architectural pattern:
+JetPulse POS is structured as an **Enterprise Single Page Application (SPA)** following the **Model-View-ViewModel (MVVM)** architectural pattern:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -36,7 +36,7 @@ ApexPOS is structured as an **Enterprise Single Page Application (SPA)** followi
 ## 2. Comprehensive Directory & File Structure
 
 ```
-JET_Web_Application/
+JetPulse POS/
 ├── README.md                            # GitHub overview & quick start guide
 ├── CODEBASE_STRUCTURE.md                # (This file) Architecture & codebase guide
 ├── package.json                         # Project dependencies, devDependencies & engines
@@ -100,13 +100,13 @@ JET_Web_Application/
 │       │   ├── dashboard.ts             # POS Register workspace module
 │       │   ├── incidents.ts             # Order History & Receipts archive module
 │       │   ├── customers.ts             # Customer Directory & CRM module
-│       │   └── about.ts                 # Architecture overview module
+│       │   └── about.ts                 # System Diagnostics & Architecture overview module
 │       │
 │       └── views/                       # JET PAGE HTML VIEWS
 │           ├── dashboard.html           # Hosts dual-pane POS workspace & modals
 │           ├── incidents.html           # Revenue KPI cards, search bar & order history
 │           ├── customers.html           # Customer cards, tier badges, KPIs & Add modal
-│           └── about.html               # Technical architecture documentation view
+│           └── about.html               # System Diagnostics, Live Metrics & Architecture view
 ```
 
 ---
@@ -114,7 +114,7 @@ JET_Web_Application/
 ## 3. Core Reactivity & MVVM Mechanics
 
 ### A. The Financial Calculation Tree (`cart-drawer.ts`)
-Calculations in ApexPOS reactively cascade through a pure dependency graph. When an item quantity or promo voucher changes, **zero manual DOM math** is required:
+Calculations in JetPulse POS reactively cascade through a pure dependency graph. When an item quantity or promo voucher changes, **zero manual DOM math** is required:
 
 ```
 cart (ko.observableArray of CartItem)
@@ -185,10 +185,13 @@ When a sale is completed with a customer name or phone number, `processCustomerS
 
 ```typescript
 public processCustomerSale(customerName: string, customerPhone: string, grandTotal: number): void {
-  let customers: CustomerRecord[] = StorageService.getItem<CustomerRecord[]>(StorageService.KEY_CUSTOMERS, []);
+  let customers: CustomerProfile[] = StorageService.get<CustomerProfile[]>("CUSTOMERS_LIST", DEFAULT_CUSTOMERS);
   
   // Find customer by phone number or exact name match
-  let customer = customers.find(c => (customerPhone && c.phone === customerPhone) || (customerName && c.name.toLowerCase() === customerName.toLowerCase()));
+  let customer = customers.find(c => 
+    (customerPhone && c.phone === customerPhone) || 
+    (customerName && c.name.toLowerCase() === customerName.toLowerCase())
+  );
 
   const pointsEarned = Math.floor(grandTotal);
 
@@ -211,7 +214,7 @@ public processCustomerSale(customerName: string, customerPhone: string, grandTot
     }
   } else {
     // Auto-register new customer
-    const newCustomer: CustomerRecord = {
+    const newCustomer: CustomerProfile = {
       id: "CUST-" + String(Date.now()).slice(-4),
       name: customerName,
       phone: customerPhone,
@@ -226,7 +229,7 @@ public processCustomerSale(customerName: string, customerPhone: string, grandTot
     customers.push(newCustomer);
   }
 
-  StorageService.setItem(StorageService.KEY_CUSTOMERS, customers);
+  StorageService.set("CUSTOMERS_LIST", customers);
 }
 ```
 
@@ -260,11 +263,11 @@ Declarative binding handlers eliminate boilerplate DOM manipulation:
 - **[`base-model.ts`](./src/ts/framework/base-model.ts)**: Centralized singleton formatters (`formatCurrency`, `formatNumber`, `formatDateTime`), reference number generators (`generateReference("INV-")`), and string interpolation utilities.
 - **[`base-service.ts`](./src/ts/framework/base-service.ts)**: Asynchronous REST client wrapper with simulated network latency (150–400ms) and typed Promise responses.
 - **[`storage-service.ts`](./src/ts/framework/storage-service.ts)**: Central persistence engine with namespaced storage keys:
-  - `StorageService.KEY_ORDERS` (`POS_APP_ORDERS`): Completed transaction history.
-  - `StorageService.KEY_CUSTOMERS` (`POS_APP_CUSTOMERS`): Customer CRM directory.
-  - `StorageService.KEY_CASHIERS` (`POS_APP_CASHIERS`): Registered cashier staff accounts.
-  - `StorageService.KEY_HELD_ORDERS` (`POS_APP_HELD_ORDERS`): Parked orders awaiting resumption.
-  - `StorageService.KEY_THEME` (`POS_APP_THEME`): Active dark/light theme preference.
+  - `"ORDER_HISTORY"`: Completed transaction history.
+  - `"CUSTOMERS_LIST"`: Customer CRM directory.
+  - `"CASHIERS_LIST"`: Registered cashier staff accounts.
+  - `"HELD_ORDERS"`: Parked orders awaiting resumption.
+  - `"APP_THEME"`: Active dark/light theme preference.
 
 ---
 
@@ -305,7 +308,7 @@ The root ViewModel orchestrates application-wide state:
 - **`dashboard.ts` / `dashboard.html`**: Dual-pane POS workspace hosting `<product-catalog>` and `<cart-drawer>`.
 - **`incidents.ts` / `incidents.html`**: Order History & Revenue Analytics with KPI summary cards, transaction search, payment filters, and instant receipt reprint triggers.
 - **`customers.ts` / `customers.html`**: Customer Directory & CRM dashboard with KPI metrics, search filtering, "+50 Points" bonus rewards, and manual "Add Customer" modal.
-- **`about.ts` / `about.html`**: Interactive system architecture overview and framework feature showcase.
+- **`about.ts` / `about.html`**: System Diagnostics & Architecture portal with live metric counters, quick launch CTAs, and technology stack breakdown.
 
 ---
 
@@ -337,7 +340,7 @@ The root ViewModel orchestrates application-wide state:
                │
                ▼
 [ appController.ts: onOrderCompleted() ]
-   ├── 1. Saves order record to StorageService.KEY_ORDERS
+   ├── 1. Saves order record to StorageService (ORDER_HISTORY)
    ├── 2. Calls processCustomerSale() (accumulates spend, increments visits, calculates tier)
    ├── 3. Clears active cart & resets voucher
    ├── 4. Displays success toast notification
