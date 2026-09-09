@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright (c) 2014, 2026, Oracle and/or its affiliates.
  * Licensed under The Universal Permissive License (UPL), Version 1.0
@@ -17,7 +17,7 @@ class DashboardViewModel {
 
   connected(): void {
     AccUtils.announce("POS Register workspace loaded.");
-    document.title = "POS Register - ApexPOS Enterprise";
+    document.title = "POS Register - JetPulse POS";
   }
 
   disconnected(): void {

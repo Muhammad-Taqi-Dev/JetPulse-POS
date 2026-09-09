@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright (c) 2014, 2026, Oracle and/or its affiliates.
  * Licensed under The Universal Permissive License (UPL), Version 1.0
@@ -37,7 +37,7 @@ class AboutViewModel {
 
   connected(): void {
     AccUtils.announce("About POS page loaded.");
-    document.title = "About - ApexPOS Enterprise";
+    document.title = "About - JetPulse POS";
 
     // Refresh stats upon connecting
     const orders = StorageService.get<any[]>("ORDER_HISTORY", []);

@@ -1,7 +1,7 @@
-{
-  "name": "JET_Web_Application",
+﻿{
+  "name": "jetpulse-pos",
   "version": "1.0.0",
-  "description": "An Oracle JavaScript Extension Toolkit(JET) web app",
+  "description": "JetPulse POS — Enterprise Point of Sale, Customer Loyalty CRM & Smart Thermal Invoicing for Oracle JET",
   "dependencies": {
     "@oracle/oraclejet": "~21.0.0",
     "@oracle/oraclejet-core-pack": "~21.0.0"

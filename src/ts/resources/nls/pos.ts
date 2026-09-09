@@ -1,11 +1,11 @@
-/**
+﻿/**
  * Localization (NLS): POS & Invoice Dictionary
  */
 
 const posBundle = {
   root: {
     Header: {
-      AppName: "ApexPOS Enterprise",
+      AppName: "JetPulse POS",
       TerminalId: "Terminal #04",
       Cashier: "Cashier: Muhammad Taqi",
       Branch: "Main Downtown Branch",
