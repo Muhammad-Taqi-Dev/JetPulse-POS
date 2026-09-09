@@ -1,0 +1,14 @@
+<!-- Root Application Container for POS Register -->
+<div class="pos-app-wrapper">
+    <!-- Main Dual-Pane POS Register Workspace -->
+    <main class="pos-main-workspace">
+        <!-- Left Pane: Product Catalog, Filters & Search -->
+        <product-catalog params="rootModel: rootModel"></product-catalog>
+
+        <!-- Right Pane: Live Cart, Steppers, & Invoice Summary -->
+        <cart-drawer params="rootModel: rootModel"></cart-drawer>
+    </main>
+
+    <!-- Checkout & Payment Modal Component -->
+    <checkout-modal params="rootModel: rootModel"></checkout-modal>
+</div>

@@ -1,0 +1,143 @@
+<!-- ko if: $component.isOpen() && $component.receipt() -->
+<div class="modal-backdrop" data-bind="click: $component.close">
+    <div class="receipt-dialog" data-bind="click: function(d, e) { e.stopPropagation(); }">
+        <!-- Dialog Header Actions (Hidden on Print) -->
+        <div class="receipt-actions-header no-print">
+            <span class="success-badge">✅ Tax Invoice &amp; Receipt</span>
+            <div class="receipt-header-btns">
+                <button class="btn btn-secondary btn-sm" data-bind="click: $component.print">
+                    <span>🖨️ Print Receipt</span>
+                </button>
+                <button class="btn btn-primary btn-sm" data-bind="click: $component.startNewSale">
+                    <span>＋ New Sale</span>
+                </button>
+                <button class="modal-close-btn" data-bind="click: $component.close" title="Close">✕</button>
+            </div>
+        </div>
+
+        <!-- The Thermal Receipt Paper View -->
+        <div class="thermal-receipt-paper" id="printable-receipt">
+            <!-- Header -->
+            <div class="receipt-brand-header">
+                <h2 class="receipt-store-name" data-bind="text: $component.nls.Receipt.StoreName"></h2>
+                <p class="receipt-store-address" data-bind="text: $component.nls.Receipt.StoreAddress"></p>
+                <p class="receipt-store-phone" data-bind="text: $component.nls.Receipt.Phone"></p>
+                <p class="receipt-tax-id" data-bind="text: $component.nls.Receipt.TaxId"></p>
+                <div class="receipt-divider-dashed"></div>
+                <h3 class="receipt-invoice-title" data-bind="text: $component.nls.Receipt.InvoiceTitle"></h3>
+            </div>
+
+            <!-- Meta Details -->
+            <div class="receipt-meta-info">
+                <div class="receipt-meta-row">
+                    <span data-bind="text: $component.nls.Receipt.OrderRef"></span>
+                    <strong data-bind="text: $component.receipt().referenceNumber"></strong>
+                </div>
+                <div class="receipt-meta-row">
+                    <span data-bind="text: $component.nls.Receipt.Date"></span>
+                    <span data-bind="text: $component.baseModel.formatDateTime($component.receipt().timestamp)"></span>
+                </div>
+                <div class="receipt-meta-row">
+                    <span>Customer:</span>
+                    <strong data-bind="text: $component.receipt().customerName || 'Walk-in Customer'"></strong>
+                </div>
+                <!-- ko if: $component.receipt().customerPhone -->
+                <div class="receipt-meta-row">
+                    <span>Phone:</span>
+                    <span data-bind="text: $component.receipt().customerPhone"></span>
+                </div>
+                <!-- /ko -->
+                <!-- ko if: $component.receipt().cashierName -->
+                <div class="receipt-meta-row">
+                    <span>Cashier:</span>
+                    <span data-bind="text: $component.receipt().cashierName"></span>
+                </div>
+                <!-- /ko -->
+                <div class="receipt-meta-row">
+                    <span data-bind="text: $component.nls.Receipt.PaymentType"></span>
+                    <strong data-bind="text: ($component.receipt().paymentMethod || 'CASH').toUpperCase()"></strong>
+                </div>
+                <!-- ko if: $component.receipt().authCode -->
+                <div class="receipt-meta-row">
+                    <span>Auth / TxID:</span>
+                    <span data-bind="text: $component.receipt().authCode"></span>
+                </div>
+                <!-- /ko -->
+            </div>
+
+            <div class="receipt-divider-dashed"></div>
+
+            <!-- Items Table -->
+            <table class="receipt-items-table">
+                <thead>
+                    <tr>
+                        <th class="text-left">Item</th>
+                        <th class="text-center">Qty</th>
+                        <th class="text-right">Price</th>
+                        <th class="text-right">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- ko foreach: $component.receipt().items -->
+                    <tr>
+                        <td class="text-left">
+                            <span data-bind="text: name"></span>
+                            <!-- ko if: typeof discountPercent === 'number' && discountPercent > 0 -->
+                            <small class="receipt-item-disc" data-bind="text: ' (-' + discountPercent + '%)'"></small>
+                            <!-- /ko -->
+                        </td>
+                        <td class="text-center" data-bind="text: quantity"></td>
+                        <td class="text-right" data-bind="currency: unitPrice || price"></td>
+                        <td class="text-right" data-bind="currency: typeof lineTotal === 'number' ? lineTotal : ((unitPrice || price) * quantity)"></td>
+                    </tr>
+                    <!-- /ko -->
+                </tbody>
+            </table>
+
+            <div class="receipt-divider-dashed"></div>
+
+            <!-- Totals Breakdown -->
+            <div class="receipt-totals-section">
+                <div class="receipt-total-row">
+                    <span>Subtotal:</span>
+                    <span data-bind="currency: $component.receipt().subTotal"></span>
+                </div>
+                <!-- ko if: $component.receipt().discountAmount > 0 -->
+                <div class="receipt-total-row discount">
+                    <span>Discount:</span>
+                    <span data-bind="text: '-' + $component.baseModel.formatCurrency($component.receipt().discountAmount)"></span>
+                </div>
+                <!-- /ko -->
+                <div class="receipt-total-row">
+                    <span>VAT / Tax (8%):</span>
+                    <span data-bind="currency: $component.receipt().taxAmount"></span>
+                </div>
+                <div class="receipt-divider-solid"></div>
+                <div class="receipt-total-row grand-total">
+                    <strong>TOTAL:</strong>
+                    <strong data-bind="currency: $component.receipt().grandTotal"></strong>
+                </div>
+                <div class="receipt-divider-solid"></div>
+                <div class="receipt-total-row">
+                    <span>Amount Tendered:</span>
+                    <span data-bind="currency: typeof $component.receipt().amountTendered === 'number' ? $component.receipt().amountTendered : $component.receipt().grandTotal"></span>
+                </div>
+                <div class="receipt-total-row">
+                    <span>Change Returned:</span>
+                    <span data-bind="currency: $component.receipt().changeDue || 0"></span>
+                </div>
+            </div>
+
+            <!-- Barcode & Footer -->
+            <div class="receipt-footer-section">
+                <div class="receipt-barcode">
+                    <div class="barcode-lines">||||| | |||| || |||||| | ||||| ||</div>
+                    <span class="barcode-number" data-bind="text: $component.receipt().referenceNumber"></span>
+                </div>
+                <p class="receipt-thankyou" data-bind="text: $component.nls.Receipt.ThankYou"></p>
+                <p class="receipt-policy" data-bind="text: $component.nls.Receipt.ReturnPolicy"></p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /ko -->

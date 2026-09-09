@@ -1,0 +1,133 @@
+<div class="pos-history-page">
+    <!-- Header Summary KPI Stats -->
+    <div class="history-stats-grid">
+        <div class="stat-card">
+            <div class="stat-card-icon">💰</div>
+            <div class="stat-card-info">
+                <span class="stat-card-label">Total Revenue</span>
+                <h3 class="stat-card-value" data-bind="currency: totalSales"></h3>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon">🧾</div>
+            <div class="stat-card-info">
+                <span class="stat-card-label">Completed Sales</span>
+                <h3 class="stat-card-value" data-bind="text: totalOrdersCount"></h3>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon">📈</div>
+            <div class="stat-card-info">
+                <span class="stat-card-label">Average Sale</span>
+                <h3 class="stat-card-value" data-bind="currency: avgOrderValue"></h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Control Toolbar -->
+    <div class="history-toolbar">
+        <div class="search-box-wrapper history-search">
+            <span class="search-icon">🔍</span>
+            <input type="text"
+                   class="catalog-search-input"
+                   data-bind="textInput: searchQuery"
+                   placeholder="Search by invoice #, customer name, payment method..." />
+        </div>
+        <div class="history-toolbar-actions">
+            <button class="btn btn-secondary btn-sm" data-bind="click: loadOrders">
+                <span>🔄 Refresh</span>
+            </button>
+            <button class="btn btn-secondary btn-sm btn-danger"
+                    data-bind="click: clearHistory, enable: orders().length > 0">
+                <span>🗑️ Clear History</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Orders List -->
+    <div class="history-content-area">
+        <!-- ko if: orders().length === 0 -->
+        <div class="empty-history-view">
+            <div class="empty-cart-icon">📜</div>
+            <h3>No Completed Transactions Yet</h3>
+            <p>Go to the POS Register to process orders. Completed sales will automatically archive here.</p>
+        </div>
+        <!-- /ko -->
+
+        <!-- ko if: orders().length > 0 && filteredOrders().length === 0 -->
+        <div class="empty-history-view">
+            <div class="empty-cart-icon">🔎</div>
+            <h3>No matching transactions found</h3>
+            <p>Try searching with another keyword or reference number.</p>
+        </div>
+        <!-- /ko -->
+
+        <!-- ko if: filteredOrders().length > 0 -->
+        <div class="orders-cards-grid">
+            <!-- ko foreach: filteredOrders -->
+            <div class="order-history-card">
+                <div class="order-card-header">
+                    <div class="order-ref-group">
+                        <span class="order-ref-badge" data-bind="text: referenceNumber"></span>
+                        <span class="order-time" data-bind="text: $parent.baseModel.formatDateTime(timestamp)"></span>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <!-- ko if: cashierName -->
+                        <span class="cashier-tag" style="font-size: 11px; color: var(--color-text-secondary); background: var(--color-bg-secondary); padding: 2px 8px; border-radius: 6px; border: 1px solid var(--color-border);" data-bind="text: '👤 ' + cashierName"></span>
+                        <!-- /ko -->
+                        <span class="payment-method-pill"
+                              data-bind="text: paymentMethod.toUpperCase(), css: paymentMethod">
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-card-body">
+                    <div class="order-meta-line">
+                        <span class="meta-label">Customer:</span>
+                        <strong class="meta-value" data-bind="text: customerName || 'Walk-in Customer'"></strong>
+                    </div>
+                    <!-- ko if: customerPhone -->
+                    <div class="order-meta-line">
+                        <span class="meta-label">Phone:</span>
+                        <span class="meta-value" data-bind="text: customerPhone"></span>
+                    </div>
+                    <!-- /ko -->
+
+                    <div class="order-items-summary">
+                        <span class="items-count-badge" data-bind="text: items.length + ' item(s)'"></span>
+                        <div class="items-mini-list">
+                            <!-- ko foreach: items -->
+                            <span class="mini-item-tag" data-bind="text: quantity + 'x ' + name"></span>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-card-footer">
+                    <div class="order-totals-breakdown">
+                        <div class="total-line">
+                            <span>Subtotal:</span>
+                            <span data-bind="currency: subTotal"></span>
+                        </div>
+                        <!-- ko if: discountAmount > 0 -->
+                        <div class="total-line discount-text">
+                            <span>Discount:</span>
+                            <span data-bind="text: '-' + $parent.baseModel.formatCurrency(discountAmount)"></span>
+                        </div>
+                        <!-- /ko -->
+                        <div class="total-line grand-total-text">
+                            <span>Total Paid:</span>
+                            <strong data-bind="currency: grandTotal"></strong>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-sm reprint-btn"
+                            data-bind="click: function() { $parent.reprintReceipt($data); }">
+                        <span>🖨️ Thermal Receipt</span>
+                    </button>
+                </div>
+            </div>
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+    </div>
+</div>

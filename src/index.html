@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<!--
+ Copyright (c) 2014, 2026, Oracle and/or its affiliates.
+ Licensed under The Universal Permissive License (UPL), Version 1.0
+ as shown at https://oss.oracle.com/licenses/upl/
+ -->
+
+<html lang="en-us" data-theme="dark">
+  <head>
+    <title>ApexPOS Enterprise - Smart Point of Sale &amp; Invoice Generator</title>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1">
+    <meta name="description" content="Enterprise-grade Point of Sale (POS) and Real-Time Thermal Invoice Generator built on Oracle JET and Knockout.js MVVM architecture.">
+    <meta name="author" content="Muhammad Taqi">
+    <link rel="icon" href="css/images/JET-Favicon-Red-32x32.png" type="image/x-icon" />
+
+    <!-- This is the main css file for the default theme -->
+		<!-- injector:theme -->
+		<!-- endinjector -->
+
+    <!-- This contains icon fonts used by the starter template -->
+		<!-- injector:font -->
+		<!-- endinjector:font -->
+
+    <!-- Application custom styling -->
+    <link rel="stylesheet" href="css/app.css" type="text/css"/>
+  </head>
+  <body class="oj-web-applayout-body" data-bind="click: closeCashierDropdown">
+
+    <div id="globalBody">
+
+      <div id="announce" tabindex="-1" class="send-off-screen" :aria-live="[[manner]]" aria-atomic="true">
+        <p id="ariaLiveMessage"><oj-bind-text value="[[message]]"></oj-bind-text></p>
+      </div>
+
+      <div id="pageContent" class="oj-web-applayout-page">
+        <!-- ================================================================
+             MASTER UNIFIED ENTERPRISE HEADER
+             ================================================================ -->
+        <header role="banner" class="pos-unified-navbar">
+          <!-- Left Branding & Terminal Info -->
+          <div class="navbar-left">
+            <div class="brand-badge-main" data-bind="click: function() { goToPage('dashboard'); }">
+              <span class="brand-logo-icon">⚡</span>
+              <div class="brand-info-col">
+                <h1 class="brand-title-main">ApexPOS Enterprise</h1>
+                <span class="terminal-badge-tag">Terminal #04 &bull; Main Branch</span>
+              </div>
+            </div>
+            <div class="navbar-clock-badge">
+              <span class="clock-icon">🕒</span>
+              <span class="clock-time" data-bind="text: currentTime"></span>
+            </div>
+          </div>
+
+          <!-- Middle Navigation Tabs -->
+          <nav class="navbar-center-nav">
+            <button class="nav-tab-pill"
+                    data-bind="click: function() { goToPage('dashboard'); },
+                               css: { 'active': selection.path() === 'dashboard' || selection.path() === '' }">
+              <span class="tab-icon">🛒</span>
+              <span>POS Register</span>
+            </button>
+            <button class="nav-tab-pill"
+                    data-bind="click: function() { goToPage('incidents'); },
+                               css: { 'active': selection.path() === 'incidents' }">
+              <span class="tab-icon">🧾</span>
+              <span>Order History</span>
+            </button>
+            <button class="nav-tab-pill"
+                    data-bind="click: function() { goToPage('customers'); },
+                               css: { 'active': selection.path() === 'customers' }">
+              <span class="tab-icon">👥</span>
+              <span>Customers</span>
+            </button>
+            <button class="nav-tab-pill"
+                    data-bind="click: function() { goToPage('about'); },
+                               css: { 'active': selection.path() === 'about' }">
+              <span class="tab-icon">ℹ️</span>
+              <span>About POS</span>
+            </button>
+          </nav>
+
+          <!-- Right Actions (Cart Counter, Cashier Switcher, Theme Toggle) -->
+          <div class="navbar-right-actions">
+            <!-- Parked / Held Orders Pill -->
+            <!-- ko if: heldOrders().length > 0 -->
+            <div class="navbar-held-pill" data-bind="click: openHeldOrdersModal" title="View Parked / Held Orders">
+              <span class="pill-pulse-dot"></span>
+              <span class="pill-icon">⏸️</span>
+              <span class="pill-label">Parked:</span>
+              <span class="pill-count-bubble held-count" data-bind="text: heldOrders().length"></span>
+            </div>
+            <!-- /ko -->
+
+            <!-- Active Orders Cart Counter Pill -->
+            <div class="navbar-cart-pill" data-bind="click: function() { goToPage('dashboard'); }">
+              <span class="pill-icon">🛒</span>
+              <span class="pill-label">Active Orders:</span>
+              <span class="pill-count-bubble" data-bind="text: cartItemCount, pulseOnChange: cartItemCount"></span>
+            </div>
+
+            <!-- Cashier Switcher Dropdown -->
+            <div class="cashier-dropdown-wrapper" data-bind="click: function(d, e) { e.stopPropagation(); }">
+              <button class="cashier-select-btn" data-bind="click: toggleCashierDropdown" title="Switch or Manage Cashier">
+                <span class="cashier-btn-avatar" data-bind="text: activeCashier().avatar"></span>
+                <div class="cashier-btn-text">
+                  <span class="cashier-btn-sub">Active Cashier</span>
+                  <strong class="cashier-btn-name" data-bind="text: activeCashier().name"></strong>
+                </div>
+                <span class="dropdown-caret">▼</span>
+              </button>
+
+              <!-- Cashier Dropdown Popup Menu -->
+              <!-- ko if: isCashierDropdownOpen() -->
+              <div class="cashier-dropdown-menu">
+                <div class="dropdown-menu-header">
+                  <span class="menu-header-title">Switch / Manage Cashier</span>
+                  <span class="cashier-count-tag" data-bind="text: cashiers().length + ' Cashiers'"></span>
+                </div>
+
+                <div class="cashier-list-scroll">
+                  <!-- ko foreach: cashiers -->
+                  <div class="cashier-menu-item"
+                       data-bind="css: { 'is-active': $data.id === $parent.activeCashier().id },
+                                  click: function() { $parent.switchCashier($data); }">
+                    <span class="item-avatar" data-bind="text: avatar"></span>
+                    <div class="item-info">
+                      <strong class="item-name" data-bind="text: name"></strong>
+                      <span class="item-role" data-bind="text: role"></span>
+                    </div>
+                    <!-- ko if: $data.id === $parent.activeCashier().id -->
+                    <span class="active-check-badge">✓ Active</span>
+                    <!-- /ko -->
+                    <!-- ko ifnot: $data.id === $parent.activeCashier().id -->
+                    <button class="remove-cashier-btn"
+                            data-bind="click: function(d, e) { $parent.removeCashier($data, e); }"
+                            title="Remove Cashier">🗑️</button>
+                    <!-- /ko -->
+                  </div>
+                  <!-- /ko -->
+                </div>
+
+                <div class="dropdown-menu-footer">
+                  <button class="add-cashier-btn" data-bind="click: openAddCashierModal">
+                    <span>＋ Add New Cashier</span>
+                  </button>
+                </div>
+              </div>
+              <!-- /ko -->
+            </div>
+
+            <!-- Single Theme Switcher Button -->
+            <button class="theme-toggle-btn" data-bind="click: toggleTheme" title="Toggle Dark/Light Mode">
+              <!-- ko if: currentTheme() === 'dark' -->
+              <span>☀️ Light</span>
+              <!-- /ko -->
+              <!-- ko if: currentTheme() === 'light' -->
+              <span>🌙 Dark</span>
+              <!-- /ko -->
+            </button>
+          </div>
+        </header>
+
+        <!-- ================================================================
+             MAIN ROUTER OUTLET (DASHBOARD / INCIDENTS / CUSTOMERS / ABOUT)
+             ================================================================ -->
+        <oj-module role="main" class="pos-app-main-content" config="[[moduleAdapter.koObservableConfig]]">
+        </oj-module>
+
+        <!-- ================================================================
+             ADD CASHIER MODAL DIALOG
+             ================================================================ -->
+        <!-- ko if: isAddCashierModalOpen() -->
+        <div class="modal-backdrop" data-bind="click: closeAddCashierModal">
+          <div class="modal-dialog add-cashier-dialog" data-bind="click: function(d, e) { e.stopPropagation(); }">
+            <div class="modal-header">
+              <div class="modal-title-group">
+                <span class="modal-header-icon">👤</span>
+                <div>
+                  <h3 class="modal-title">Add New Cashier / Operator</h3>
+                  <p class="modal-subtitle">Create a new cashier profile to authorize and log POS transactions.</p>
+                </div>
+              </div>
+              <button class="modal-close-btn" data-bind="click: closeAddCashierModal">✕</button>
+            </div>
+
+            <div class="modal-body">
+              <div class="form-group">
+                <label class="form-label">Cashier Full Name:</label>
+                <input type="text"
+                       class="form-control"
+                       data-bind="value: newCashierName"
+                       placeholder="e.g. Alex Rivera, Emily Watson"
+                       autofocus />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Role / Shift Title:</label>
+                <select class="form-control" data-bind="value: newCashierRole">
+                  <option value="Head Cashier">Head Cashier</option>
+                  <option value="Senior POS Operator">Senior POS Operator</option>
+                  <option value="Cashier">Cashier</option>
+                  <option value="Barista / Cashier">Barista / Cashier</option>
+                  <option value="Shift Supervisor">Shift Supervisor</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Avatar Emoji:</label>
+                <div class="avatar-picker-row">
+                  <!-- ko foreach: ['👤', '👩‍💼', '👨‍🍳', '👩‍🎓', '👨‍💻', '👩‍🔬', '👨‍🎨', '🧑‍💼'] -->
+                  <button class="avatar-opt-btn"
+                          data-bind="text: $data,
+                                     css: { 'selected': $parent.newCashierAvatar() === $data },
+                                     click: function() { $parent.newCashierAvatar($data); }"></button>
+                  <!-- /ko -->
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button class="btn btn-secondary" data-bind="click: closeAddCashierModal">Cancel</button>
+              <button class="btn btn-primary" data-bind="click: addCashier">Save &amp; Switch</button>
+            </div>
+          </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- ================================================================
+             HELD / PARKED ORDERS MODAL DIALOG
+             ================================================================ -->
+        <!-- ko if: isHeldOrdersModalOpen() -->
+        <div class="modal-backdrop" data-bind="click: closeHeldOrdersModal">
+          <div class="modal-dialog held-orders-dialog" data-bind="click: function(d, e) { e.stopPropagation(); }">
+            <div class="modal-header">
+              <div class="modal-title-group">
+                <span class="modal-header-icon">⏸️</span>
+                <div>
+                  <h3 class="modal-title">Parked / Held Orders</h3>
+                  <p class="modal-subtitle">Resume or manage suspended transactions stored on this register.</p>
+                </div>
+              </div>
+              <button class="modal-close-btn" data-bind="click: closeHeldOrdersModal">✕</button>
+            </div>
+
+            <div class="modal-body held-orders-body">
+              <!-- ko if: heldOrders().length === 0 -->
+              <div class="empty-held-orders-view">
+                <span class="empty-held-icon">📋</span>
+                <h4>No Parked Orders</h4>
+                <p>When you click "Hold" on an active cart, the order is parked here until you are ready to resume and complete checkout.</p>
+              </div>
+              <!-- /ko -->
+
+              <!-- ko if: heldOrders().length > 0 -->
+              <div class="held-orders-list-scroll">
+                <!-- ko foreach: heldOrders -->
+                <div class="held-order-card">
+                  <div class="held-card-top">
+                    <div class="held-ref-info">
+                      <span class="held-id-badge" data-bind="text: '#' + id"></span>
+                      <span class="held-time-text" data-bind="text: formattedTime"></span>
+                    </div>
+                    <div class="held-customer-cashier">
+                      <span class="held-customer-tag">👤 <strong data-bind="text: customerName"></strong></span>
+                      <span class="held-cashier-tag" data-bind="text: 'Cashier: ' + cashierName"></span>
+                    </div>
+                  </div>
+
+                  <div class="held-items-preview">
+                    <span class="held-items-count" data-bind="text: items.length + ' item(s):'"></span>
+                    <div class="held-items-chips">
+                      <!-- ko foreach: items -->
+                      <span class="held-item-chip" data-bind="text: quantity + 'x ' + name"></span>
+                      <!-- /ko -->
+                    </div>
+                  </div>
+
+                  <div class="held-card-bottom">
+                    <div class="held-amount-col">
+                      <span class="held-amount-label">Grand Total:</span>
+                      <strong class="held-amount-val" data-bind="currency: grandTotal"></strong>
+                    </div>
+                    <div class="held-actions-group">
+                      <button class="btn btn-secondary btn-sm held-delete-btn"
+                              data-bind="click: function(d, e) { $parent.deleteHeldOrder($data, e); }"
+                              title="Discard this held order">
+                        <span>🗑️ Discard</span>
+                      </button>
+                      <button class="btn btn-primary btn-sm held-resume-btn"
+                              data-bind="click: function() { $parent.resumeHeldOrder($data); }"
+                              title="Restore order items to active cart">
+                        <span>▶ Resume Order</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- /ko -->
+              </div>
+              <!-- /ko -->
+            </div>
+
+            <div class="modal-footer held-modal-footer">
+              <!-- ko if: heldOrders().length > 0 -->
+              <button class="btn btn-secondary btn-sm" data-bind="click: clearAllHeldOrders">
+                <span>Clear All Held</span>
+              </button>
+              <!-- /ko -->
+              <button class="btn btn-primary" data-bind="click: closeHeldOrdersModal">Close</button>
+            </div>
+          </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- ================================================================
+             GLOBAL THERMAL INVOICE & PRINTABLE RECEIPT COMPONENT MODAL
+             ================================================================ -->
+        <invoice-receipt params="rootModel: $data"></invoice-receipt>
+
+        <!-- ================================================================
+             GLOBAL TOAST NOTIFICATIONS CONTAINER
+             ================================================================ -->
+        <div class="pos-toast-container" data-bind="foreach: toasts">
+          <div class="pos-toast" data-bind="css: type">
+            <span data-bind="text: message"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- This injects script tags for the main javascript files -->
+		<!-- injector:scripts -->
+		<!-- endinjector -->
+
+  </body>
+
+</html>

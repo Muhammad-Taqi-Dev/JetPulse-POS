@@ -1,0 +1,41 @@
+<header class="pos-top-header">
+    <div class="pos-header-left">
+        <div class="brand-badge">
+            <span class="brand-logo-icon">⚡</span>
+            <div class="brand-text">
+                <h1 class="brand-title" data-bind="text: $component.nls.Header.AppName"></h1>
+                <span class="terminal-badge" data-bind="text: $component.nls.Header.TerminalId"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="pos-header-center">
+        <div class="header-stat">
+            <span class="stat-icon">🕒</span>
+            <span class="stat-text" data-bind="text: $component.currentTime"></span>
+        </div>
+        <div class="header-stat divider-left">
+            <span class="stat-icon">👤</span>
+            <span class="stat-text" data-bind="text: $component.nls.Header.Cashier"></span>
+        </div>
+    </div>
+
+    <div class="pos-header-right">
+        <!-- Order items count pill -->
+        <div class="order-counter-pill">
+            <span class="pill-icon">🛒</span>
+            <span class="pill-label" data-bind="text: $component.nls.Header.ActiveOrders"></span>
+            <span class="pill-count" data-bind="text: $component.cartItemCount, pulseOnChange: $component.cartItemCount"></span>
+        </div>
+
+        <!-- Theme Switcher -->
+        <button class="theme-toggle-btn" data-bind="click: $component.toggleTheme" title="Toggle Dark/Light Mode">
+            <!-- ko if: $component.currentTheme() === 'dark' -->
+            <span>☀️ Light</span>
+            <!-- /ko -->
+            <!-- ko if: $component.currentTheme() === 'light' -->
+            <span>🌙 Dark</span>
+            <!-- /ko -->
+        </button>
+    </div>
+</header>

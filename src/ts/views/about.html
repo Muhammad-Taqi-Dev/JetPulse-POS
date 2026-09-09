@@ -1,0 +1,102 @@
+<div class="pos-about-page">
+    <!-- Hero Card -->
+    <div class="about-hero-card">
+        <div class="about-hero-badge">⚡ ApexPOS Enterprise v21.0.0</div>
+        <h2>Enterprise Point of Sale & Smart Thermal Invoice Engine</h2>
+        <p class="about-hero-sub">
+            Built natively on <strong>Oracle JavaScript Extension Toolkit (Oracle JET v21)</strong>, <strong>TypeScript</strong>, and <strong>Knockout.js MVVM</strong> architecture with modular AMD web components.
+        </p>
+
+        <!-- Live System Metric Chips -->
+        <div class="about-stats-row">
+            <div class="about-stat-pill">
+                <span class="stat-pill-icon">📦</span>
+                <span class="stat-pill-val" data-bind="text: totalProducts"></span>
+                <span class="stat-pill-lbl">Catalog Items</span>
+            </div>
+            <div class="about-stat-pill">
+                <span class="stat-pill-icon">🧾</span>
+                <span class="stat-pill-val" data-bind="text: totalOrders"></span>
+                <span class="stat-pill-lbl">Orders Recorded</span>
+            </div>
+            <div class="about-stat-pill">
+                <span class="stat-pill-icon">👥</span>
+                <span class="stat-pill-val" data-bind="text: totalCustomers"></span>
+                <span class="stat-pill-lbl">CRM Profiles</span>
+            </div>
+            <div class="about-stat-pill">
+                <span class="stat-pill-icon">👨‍💼</span>
+                <span class="stat-pill-val" data-bind="text: totalCashiers"></span>
+                <span class="stat-pill-lbl">Cashier Operators</span>
+            </div>
+            <div class="about-stat-pill status-pill">
+                <span class="stat-pill-dot"></span>
+                <span class="stat-pill-val" data-bind="text: systemStatus"></span>
+            </div>
+        </div>
+
+        <!-- Quick Launch CTA -->
+        <div class="about-cta-row">
+            <button class="about-cta-btn primary" data-bind="click: goToPOS">
+                <span>🛒 Launch POS Register</span>
+            </button>
+            <button class="about-cta-btn secondary" data-bind="click: goToHistory">
+                <span>🧾 View Order History</span>
+            </button>
+            <button class="about-cta-btn secondary" data-bind="click: goToCustomers">
+                <span>👥 Customer Directory</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Feature Matrix Grid -->
+    <div class="about-features-grid">
+        <div class="about-feature-box">
+            <span class="feat-icon">⚡</span>
+            <h3>Knockout MVVM Reactivity</h3>
+            <p>Two-way declarative bindings with <code>ko.pureComputed</code> dependency trees for instant subtotal, promo voucher discount, VAT, and grand total recalculation.</p>
+        </div>
+
+        <div class="about-feature-box">
+            <span class="feat-icon">⏸️</span>
+            <h3>Parked & Held Orders</h3>
+            <p>Full state snapshot capture for interrupted transactions, live navbar indicator badges, and instant resume / discard workflows.</p>
+        </div>
+
+        <div class="about-feature-box">
+            <span class="feat-icon">👨‍💼</span>
+            <h3>Cashier Management</h3>
+            <p>Shift switching, custom operator registration with avatar and role assignment, PIN authorization, and transaction log attribution.</p>
+        </div>
+
+        <div class="about-feature-box">
+            <span class="feat-icon">💳</span>
+            <h3>Multi-Tender Payments</h3>
+            <p>Cash with quick-cash tender chips and shortage checks, Virtual Card terminal with PIN pad simulation, and high-contrast QR Digital Pay.</p>
+        </div>
+
+        <div class="about-feature-box">
+            <span class="feat-icon">🧾</span>
+            <h3>80mm Thermal Receipt Engine</h3>
+            <p>Standard POS thermal receipt format with store branding, VAT breakdown, barcode generator, and <code>@media print</code> physical printer layout.</p>
+        </div>
+
+        <div class="about-feature-box">
+            <span class="feat-icon">👥</span>
+            <h3>Automated CRM Loyalty Sync</h3>
+            <p>Automatic customer registration during checkout, cumulative lifetime spend tracking, visit counter increments, and automatic loyalty tier upgrades.</p>
+        </div>
+
+        <div class="about-feature-box">
+            <span class="feat-icon">💾</span>
+            <h3>Enterprise Persistence Layer</h3>
+            <p>Namespaced <code>StorageService</code> for transaction archives, customer CRM, staff profiles, and active UI theme configuration.</p>
+        </div>
+
+        <div class="about-feature-box">
+            <span class="feat-icon">🎨</span>
+            <h3>Unified Dark & Light Themes</h3>
+            <p>Curated high-contrast design system, micro-animations, glassmorphism headers, and full-viewport responsive terminal layouts.</p>
+        </div>
+    </div>
+</div>

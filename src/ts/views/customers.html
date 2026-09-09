@@ -1,0 +1,185 @@
+<div class="pos-customers-page">
+    <!-- Top KPI Stats Row -->
+    <div class="history-stats-grid">
+        <div class="stat-card">
+            <div class="stat-card-icon">👥</div>
+            <div class="stat-card-info">
+                <span class="stat-card-label">Total Customers</span>
+                <h3 class="stat-card-value" data-bind="text: totalCustomersCount"></h3>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon">⭐</div>
+            <div class="stat-card-info">
+                <span class="stat-card-label">Loyalty Points Issued</span>
+                <h3 class="stat-card-value" data-bind="text: totalPointsAwarded() + ' pts'"></h3>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon">💎</div>
+            <div class="stat-card-info">
+                <span class="stat-card-label">Total Customer Spend</span>
+                <h3 class="stat-card-value" data-bind="currency: totalCustomersSpend"></h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header & Search Toolbar -->
+    <div class="customers-header-bar">
+        <div class="search-box-wrapper customers-search">
+            <span class="search-icon">🔍</span>
+            <input type="text"
+                   class="catalog-search-input"
+                   data-bind="textInput: searchQuery"
+                   placeholder="Search by customer name, phone, or tier..." />
+        </div>
+        <div class="customers-actions-row">
+            <button class="btn btn-secondary btn-sm" data-bind="click: loadCustomers">
+                <span>🔄 Refresh</span>
+            </button>
+            <button class="btn btn-primary btn-sm" data-bind="click: openAddCustomerModal">
+                <span>＋ Add Customer</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <!-- ko if: filteredCustomers().length === 0 -->
+    <div class="empty-history-view">
+        <div class="empty-cart-icon">👥</div>
+        <h3>No matching customers found</h3>
+        <p>Try searching by another name, or register a new customer above or during POS checkout.</p>
+    </div>
+    <!-- /ko -->
+
+    <!-- Customer Cards Grid -->
+    <!-- ko if: filteredCustomers().length > 0 -->
+    <div class="customers-grid">
+        <!-- ko foreach: filteredCustomers -->
+        <div class="customer-card">
+            <div class="customer-card-header">
+                <div class="customer-avatar" data-bind="text: avatar"></div>
+                <div class="customer-info-main">
+                    <h3 class="customer-name" data-bind="text: name"></h3>
+                    <span class="customer-id" data-bind="text: id"></span>
+                </div>
+                <span class="tier-badge" data-bind="text: tier, css: tier.toLowerCase()"></span>
+            </div>
+
+            <div class="customer-card-body">
+                <div class="customer-contact-row">
+                    <span class="contact-icon">📞</span>
+                    <span class="contact-text" data-bind="text: phone"></span>
+                </div>
+                <div class="customer-contact-row">
+                    <span class="contact-icon">✉️</span>
+                    <span class="contact-text" data-bind="text: email"></span>
+                </div>
+
+                <div class="customer-metrics-row">
+                    <div class="metric-box">
+                        <span class="metric-label">Loyalty Points</span>
+                        <strong class="metric-val points-val" data-bind="text: points + ' pts'"></strong>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-label">Total Spend</span>
+                        <strong class="metric-val" data-bind="currency: totalSpent"></strong>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-label">Visits</span>
+                        <strong class="metric-val" data-bind="text: visits"></strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="customer-card-footer">
+                <button class="btn btn-secondary btn-sm"
+                        data-bind="click: function() { $parent.addPoints($data); }"
+                        title="Award 50 Bonus Points">
+                    <span>⭐ +50 Pts</span>
+                </button>
+                <button class="btn btn-secondary btn-sm btn-danger"
+                        data-bind="click: function(d, e) { $parent.deleteCustomer($data, e); }"
+                        title="Delete customer record">
+                    <span>🗑️ Delete</span>
+                </button>
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+    <!-- /ko -->
+
+    <!-- ================================================================
+         ADD CUSTOMER MODAL DIALOG
+         ================================================================ -->
+    <!-- ko if: isAddCustomerModalOpen() -->
+    <div class="modal-backdrop" data-bind="click: closeAddCustomerModal">
+        <div class="modal-dialog add-cashier-dialog" data-bind="click: function(d, e) { e.stopPropagation(); }">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <span class="modal-header-icon">👥</span>
+                    <div>
+                        <h3 class="modal-title">Add New Customer Profile</h3>
+                        <p class="modal-subtitle">Manually register a customer into the loyalty CRM directory.</p>
+                    </div>
+                </div>
+                <button class="modal-close-btn" data-bind="click: closeAddCustomerModal">✕</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Customer Full Name:</label>
+                    <input type="text"
+                           class="form-control"
+                           data-bind="value: newCustomerName"
+                           placeholder="e.g. Jessica Taylor, Robert Smith"
+                           autofocus />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Phone Number:</label>
+                    <input type="text"
+                           class="form-control"
+                           data-bind="value: newCustomerPhone"
+                           placeholder="+1 (555) 000-0000" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address (Optional):</label>
+                    <input type="email"
+                           class="form-control"
+                           data-bind="value: newCustomerEmail"
+                           placeholder="customer@example.com" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Membership Tier:</label>
+                    <select class="form-control" data-bind="value: newCustomerTier">
+                        <option value="Standard">Standard</option>
+                        <option value="Silver">Silver</option>
+                        <option value="Gold">Gold</option>
+                        <option value="Platinum">Platinum</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Avatar Emoji:</label>
+                    <div class="avatar-picker-row">
+                        <!-- ko foreach: ['👤', '👩‍💼', '👨‍🍳', '👩‍🎓', '👨‍💻', '👩‍🔬', '👨‍🎨', '🧑‍💼'] -->
+                        <button class="avatar-opt-btn"
+                                data-bind="text: $data,
+                                           css: { 'selected': $parent.newCustomerAvatar() === $data },
+                                           click: function() { $parent.newCustomerAvatar($data); }"></button>
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bind="click: closeAddCustomerModal">Cancel</button>
+                <button class="btn btn-primary" data-bind="click: saveNewCustomer">Save Customer</button>
+            </div>
+        </div>
+    </div>
+    <!-- /ko -->
+</div>

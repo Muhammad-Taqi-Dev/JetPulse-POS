@@ -1,0 +1,86 @@
+<div class="product-catalog-container">
+    <!-- Top Control Bar: Search & Category Chips -->
+    <div class="catalog-controls">
+        <div class="search-box-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text"
+                   class="catalog-search-input"
+                   data-bind="textInput: $component.searchQuery, attr: { placeholder: $component.nls.Catalog.SearchPlaceholder }" />
+            <!-- ko if: $component.searchQuery() -->
+            <button class="clear-search-btn" data-bind="click: $component.clearSearch" title="Clear Search">✕</button>
+            <!-- /ko -->
+        </div>
+
+        <div class="category-chips-bar">
+            <!-- ko foreach: $component.categories -->
+            <button class="category-chip"
+                    data-bind="text: $data,
+                               css: { 'active': $component.selectedCategory() === $data },
+                               click: function() { $component.selectCategory($data); }">
+            </button>
+            <!-- /ko -->
+        </div>
+
+        <div class="catalog-meta-bar">
+            <span class="meta-item-count" data-bind="text: $component.itemCountText"></span>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <!-- ko if: $component.isLoading() -->
+    <div class="catalog-loading-state">
+        <div class="spinner"></div>
+        <p>Loading product catalog...</p>
+    </div>
+    <!-- /ko -->
+
+    <!-- Error State -->
+    <!-- ko if: $component.errorMessage() -->
+    <div class="catalog-error-state">
+        <span class="error-icon">⚠️</span>
+        <p data-bind="text: $component.errorMessage"></p>
+        <button class="retry-btn" data-bind="click: $component.init">Retry</button>
+    </div>
+    <!-- /ko -->
+
+    <!-- Product Grid View -->
+    <!-- ko ifnot: $component.isLoading() || $component.errorMessage() -->
+    <div class="product-grid">
+        <!-- ko foreach: $component.filteredProducts -->
+        <div class="product-card" data-bind="css: { 'out-of-stock': stock <= 0 }">
+            <div class="product-card-top">
+                <span class="product-icon" data-bind="text: icon"></span>
+                <span data-bind="stockBadge: stock"></span>
+            </div>
+
+            <div class="product-card-body">
+                <span class="product-sku" data-bind="text: sku"></span>
+                <h3 class="product-name" data-bind="text: name"></h3>
+                <p class="product-desc" data-bind="text: description"></p>
+            </div>
+
+            <div class="product-card-footer">
+                <div class="product-price">
+                    <span class="price-val" data-bind="currency: price"></span>
+                </div>
+                <button class="add-to-cart-btn"
+                        data-bind="click: function() { $component.addToCart($data); },
+                                   enable: stock > 0">
+                    <span class="btn-icon">＋</span>
+                    <span>Add</span>
+                </button>
+            </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- Empty Results Message -->
+        <!-- ko if: $component.filteredProducts().length === 0 -->
+        <div class="empty-catalog-message">
+            <span class="empty-icon">🔎</span>
+            <h3>No products found</h3>
+            <p>Try searching for a different item or resetting the category filter.</p>
+        </div>
+        <!-- /ko -->
+    </div>
+    <!-- /ko -->
+</div>

@@ -1,0 +1,309 @@
+<!-- ko if: $component.isOpen() -->
+<div class="modal-backdrop" data-bind="click: $component.close">
+    <div class="modal-dialog checkout-dialog" data-bind="click: function(d, e) { e.stopPropagation(); }">
+        <!-- Modal Header -->
+        <div class="modal-header">
+            <div class="modal-title-group">
+                <span class="modal-header-icon">💳</span>
+                <div>
+                    <h3 class="modal-title">Process Payment</h3>
+                    <p class="modal-subtitle">Select tender method, calculate change, or authorize electronic transaction.</p>
+                </div>
+            </div>
+            <button class="modal-close-btn" data-bind="click: $component.close" title="Close">✕</button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-body checkout-modal-body">
+            <!-- Total Payable Banner -->
+            <div class="payable-banner">
+                <div class="payable-banner-text">
+                    <span class="payable-label">Total Amount Due</span>
+                    <span class="payable-sublabel">Includes applicable taxes &amp; discounts</span>
+                </div>
+                <span class="payable-amount" data-bind="currency: $component.grandTotal"></span>
+            </div>
+
+            <!-- Payment Method Tabs -->
+            <div class="payment-methods-grid">
+                <button class="payment-method-tab"
+                        data-bind="css: { 'active': $component.selectedPaymentMethod() === 'cash' },
+                                   click: function() { $component.setPaymentMethod('cash'); }">
+                    <span class="method-icon">💵</span>
+                    <span class="method-name">Cash</span>
+                </button>
+                <button class="payment-method-tab"
+                        data-bind="css: { 'active': $component.selectedPaymentMethod() === 'card' },
+                                   click: function() { $component.setPaymentMethod('card'); }">
+                    <span class="method-icon">💳</span>
+                    <span class="method-name">Credit / Debit</span>
+                </button>
+                <button class="payment-method-tab"
+                        data-bind="css: { 'active': $component.selectedPaymentMethod() === 'qr' },
+                                   click: function() { $component.setPaymentMethod('qr'); }">
+                    <span class="method-icon">📱</span>
+                    <span class="method-name">QR Digital Pay</span>
+                </button>
+            </div>
+
+            <!-- ========================================================
+                 TENDER SPECIFIC: CASH
+                 ======================================================== -->
+            <!-- ko if: $component.selectedPaymentMethod() === 'cash' -->
+            <div class="cash-tender-section">
+                <!-- Amount Received Input -->
+                <div class="tender-form-group">
+                    <div class="tender-label-row">
+                        <label class="form-label">Amount Received (Cash Tendered):</label>
+                        <!-- ko ifnot: $component.isCashSufficient() -->
+                        <span class="tender-shortage-tag">
+                            ⚠️ Shortage: <strong data-bind="currency: $component.cashShortage"></strong>
+                        </span>
+                        <!-- /ko -->
+                        <!-- ko if: $component.isCashSufficient() -->
+                        <span class="tender-covered-tag">✓ Sufficient</span>
+                        <!-- /ko -->
+                    </div>
+
+                    <div class="input-currency-wrapper">
+                        <span class="input-prefix">$</span>
+                        <input type="text"
+                               class="form-control highlight-input"
+                               data-bind="textInput: $component.amountTendered, numericOnly: true"
+                               placeholder="0.00"
+                               autofocus />
+                    </div>
+                </div>
+
+                <!-- Quick Cash Presets -->
+                <div class="quick-cash-container">
+                    <span class="quick-cash-title">Quick Cash Presets:</span>
+                    <div class="quick-chips-grid">
+                        <button class="quick-chip chip-exact"
+                                data-bind="click: function() { $component.setQuickCash('exact'); }">
+                            Exact (<span data-bind="currency: $component.grandTotal"></span>)
+                        </button>
+                        <button class="quick-chip" data-bind="click: function() { $component.setQuickCash(5); }">$5</button>
+                        <button class="quick-chip" data-bind="click: function() { $component.setQuickCash(10); }">$10</button>
+                        <button class="quick-chip" data-bind="click: function() { $component.setQuickCash(20); }">$20</button>
+                        <button class="quick-chip" data-bind="click: function() { $component.setQuickCash(50); }">$50</button>
+                        <button class="quick-chip" data-bind="click: function() { $component.setQuickCash(100); }">$100</button>
+                    </div>
+                </div>
+
+                <!-- Quick Increment Helpers -->
+                <div class="quick-increment-row">
+                    <span class="quick-increment-title">Add Extra:</span>
+                    <div class="quick-increment-chips">
+                        <button class="inc-chip" data-bind="click: function() { $component.addQuickCash(1); }">+$1</button>
+                        <button class="inc-chip" data-bind="click: function() { $component.addQuickCash(5); }">+$5</button>
+                        <button class="inc-chip" data-bind="click: function() { $component.addQuickCash(10); }">+$10</button>
+                        <button class="inc-chip" data-bind="click: function() { $component.addQuickCash(20); }">+$20</button>
+                    </div>
+                </div>
+
+                <!-- Change Due Highlight Banner -->
+                <div class="change-due-box" data-bind="css: { 'has-change': $component.changeDue() > 0, 'is-short': !$component.isCashSufficient() }">
+                    <div class="change-label-col">
+                        <span class="change-main-label">Change to Return</span>
+                        <span class="change-sub-label">Give this change to customer</span>
+                    </div>
+                    <span class="change-amount-display"
+                          data-bind="currency: $component.changeDue, pulseOnChange: $component.changeDue"></span>
+                </div>
+            </div>
+            <!-- /ko -->
+
+            <!-- ========================================================
+                 TENDER SPECIFIC: CREDIT / DEBIT CARD
+                 ======================================================== -->
+            <!-- ko if: $component.selectedPaymentMethod() === 'card' -->
+            <div class="card-tender-section">
+                <!-- Virtual Card Graphic -->
+                <div class="virtual-card-preview">
+                    <div class="card-chip-row">
+                        <div class="emv-chip"></div>
+                        <span class="contactless-icon">📶</span>
+                        <span class="card-brand-logo">VISA / DEBIT</span>
+                    </div>
+                    <div class="card-number-display" data-bind="text: $component.cardNumber"></div>
+                    <div class="card-meta-row">
+                        <div class="card-holder-group">
+                            <span class="card-small-label">CARDHOLDER</span>
+                            <strong class="card-holder-name" data-bind="text: $component.cardHolder"></strong>
+                        </div>
+                        <div class="card-expiry-group">
+                            <span class="card-small-label">EXPIRES</span>
+                            <strong class="card-expiry-val" data-bind="text: $component.cardExpiry"></strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Terminal Simulation Box -->
+                <div class="card-terminal-status">
+                    <!-- ko if: $component.cardState() === 'idle' -->
+                    <div class="terminal-idle-view">
+                        <span class="terminal-signal-icon">📟</span>
+                        <div class="terminal-text-col">
+                            <strong>Ready for Customer Card</strong>
+                            <p>Customer may insert chip, swipe, or tap contactless device on PIN pad.</p>
+                        </div>
+                        <button class="btn btn-secondary btn-sm simulate-action-btn"
+                                data-bind="click: $component.simulateCardTap">
+                            <span>📶 Simulate Tap Card</span>
+                        </button>
+                    </div>
+                    <!-- /ko -->
+
+                    <!-- ko if: $component.cardState() === 'reading' -->
+                    <div class="terminal-reading-view">
+                        <span class="terminal-spinner"></span>
+                        <div class="terminal-text-col">
+                            <strong>Reading EMV Chip &amp; Authorizing...</strong>
+                            <p>Connecting to banking gateway securely.</p>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+
+                    <!-- ko if: $component.cardState() === 'authorized' -->
+                    <div class="terminal-auth-view">
+                        <span class="auth-check-icon">✅</span>
+                        <div class="terminal-text-col">
+                            <strong>Card Transaction Authorized!</strong>
+                            <p>Auth Code: <span class="auth-code-tag" data-bind="text: $component.cardAuthCode"></span> &bull; Approved for <span data-bind="currency: $component.grandTotal"></span></p>
+                        </div>
+                        <button class="link-btn" data-bind="click: $component.resetCardState">Retap</button>
+                    </div>
+                    <!-- /ko -->
+                </div>
+            </div>
+            <!-- /ko -->
+
+            <!-- ========================================================
+                 TENDER SPECIFIC: QR DIGITAL PAY
+                 ======================================================== -->
+            <!-- ko if: $component.selectedPaymentMethod() === 'qr' -->
+            <div class="qr-tender-section">
+                <div class="qr-container-box">
+                    <div class="qr-code-frame">
+                        <div class="qr-corner top-left"></div>
+                        <div class="qr-corner top-right"></div>
+                        <div class="qr-corner bottom-left"></div>
+                        <div class="qr-corner bottom-right"></div>
+                        
+                        <!-- High Quality SVG QR Code Simulation -->
+                        <svg class="qr-svg-graphic" viewBox="0 0 100 100" width="130" height="130">
+                            <!-- Outer Position Squares -->
+                            <rect x="5" y="5" width="28" height="28" rx="4" fill="#0f172a" />
+                            <rect x="10" y="10" width="18" height="18" rx="2" fill="#ffffff" />
+                            <rect x="14" y="14" width="10" height="10" rx="1" fill="#6366f1" />
+
+                            <rect x="67" y="5" width="28" height="28" rx="4" fill="#0f172a" />
+                            <rect x="72" y="10" width="18" height="18" rx="2" fill="#ffffff" />
+                            <rect x="76" y="14" width="10" height="10" rx="1" fill="#6366f1" />
+
+                            <rect x="5" y="67" width="28" height="28" rx="4" fill="#0f172a" />
+                            <rect x="10" y="72" width="18" height="18" rx="2" fill="#ffffff" />
+                            <rect x="14" y="76" width="10" height="10" rx="1" fill="#6366f1" />
+
+                            <!-- Simulated Data Matrix Dots -->
+                            <rect x="38" y="8" width="6" height="6" fill="#0f172a" rx="1" />
+                            <rect x="48" y="8" width="6" height="6" fill="#0f172a" rx="1" />
+                            <rect x="38" y="20" width="6" height="6" fill="#0f172a" rx="1" />
+                            <rect x="48" y="20" width="6" height="6" fill="#6366f1" rx="1" />
+                            <rect x="12" y="42" width="6" height="6" fill="#0f172a" rx="1" />
+                            <rect x="24" y="42" width="6" height="6" fill="#0f172a" rx="1" />
+                            <rect x="38" y="38" width="8" height="8" rx="2" fill="#6366f1" />
+                            <rect x="52" y="38" width="6" height="6" fill="#0f172a" rx="1" />
+                            <rect x="66" y="42" width="6" height="6" fill="#0f172a" rx="1" />
+                            <rect x="80" y="42" width="6" height="6" fill="#0f172a" rx="1" />
+                            <rect x="38" y="52" width="6" height="6" fill="#0f172a" rx="1" />
+                            <rect x="50" y="52" width="8" height="8" rx="2" fill="#6366f1" />
+                            <rect x="66" y="56" width="6" height="6" fill="#0f172a" rx="1" />
+                            <rect x="38" y="68" width="6" height="6" fill="#0f172a" rx="1" />
+                            <rect x="48" y="68" width="6" height="6" fill="#0f172a" rx="1" />
+                            <rect x="38" y="82" width="6" height="6" fill="#0f172a" rx="1" />
+                            <rect x="48" y="82" width="6" height="6" fill="#6366f1" rx="1" />
+                            <rect x="66" y="72" width="8" height="8" rx="2" fill="#6366f1" />
+                            <rect x="80" y="72" width="6" height="6" fill="#0f172a" rx="1" />
+                            <rect x="72" y="84" width="6" height="6" fill="#0f172a" rx="1" />
+                            <rect x="84" y="84" width="6" height="6" fill="#0f172a" rx="1" />
+                        </svg>
+                    </div>
+
+                    <div class="qr-info-col">
+                        <div class="qr-amount-pill">
+                            <span>Scan to Pay:</span>
+                            <strong data-bind="currency: $component.grandTotal"></strong>
+                        </div>
+                        <div class="supported-wallets-row">
+                            <span class="wallet-badge">🍏 Apple Pay</span>
+                            <span class="wallet-badge">🌐 Google Pay</span>
+                            <span class="wallet-badge">📱 PayPal</span>
+                            <span class="wallet-badge">⚡ Cash App</span>
+                        </div>
+
+                        <!-- QR Interactive Simulation Status -->
+                        <!-- ko if: $component.qrState() === 'ready' -->
+                        <button class="btn btn-secondary btn-sm simulate-action-btn"
+                                data-bind="click: $component.simulateQrScan">
+                            <span>📲 Simulate Customer Phone Scan</span>
+                        </button>
+                        <!-- /ko -->
+
+                        <!-- ko if: $component.qrState() === 'scanning' -->
+                        <div class="qr-scanning-status">
+                            <span class="terminal-spinner"></span>
+                            <span>Awaiting customer biometric confirmation...</span>
+                        </div>
+                        <!-- /ko -->
+
+                        <!-- ko if: $component.qrState() === 'paid' -->
+                        <div class="qr-paid-status">
+                            <span>✅ Payment Verified via Apple Pay!</span>
+                            <small data-bind="text: 'TxID: ' + $component.qrTxId()"></small>
+                        </div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+            <!-- /ko -->
+
+            <!-- Optional Customer Phone / Loyalty SMS Field -->
+            <div class="form-group customer-phone-group">
+                <label class="form-label">
+                    <span>📱 Customer Phone / SMS Receipt (Optional):</span>
+                </label>
+                <input type="text"
+                       class="form-control"
+                       data-bind="value: $component.customerPhone"
+                       placeholder="e.g. +1 555-0123 for digital receipt" />
+            </div>
+
+            <!-- Error Banner -->
+            <!-- ko if: $component.errorMessage() -->
+            <div class="modal-error-banner" data-bind="text: $component.errorMessage"></div>
+            <!-- /ko -->
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="modal-footer">
+            <button class="btn btn-secondary"
+                    data-bind="click: $component.close, enable: !$component.isProcessing()">
+                <span>Cancel</span>
+            </button>
+            <button class="btn btn-primary btn-complete-checkout"
+                    data-bind="click: $component.completeTransaction,
+                               enable: $component.canSubmitPayment">
+                <!-- ko if: $component.isProcessing() -->
+                <span class="btn-spinner"></span>
+                <span data-bind="text: $component.processingStep"></span>
+                <!-- /ko -->
+                <!-- ko ifnot: $component.isProcessing() -->
+                <span>💳 Complete Sale (<span data-bind="currency: $component.grandTotal"></span>)</span>
+                <!-- /ko -->
+            </button>
+        </div>
+    </div>
+</div>
+<!-- /ko -->

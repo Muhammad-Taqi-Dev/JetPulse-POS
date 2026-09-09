@@ -1,0 +1,184 @@
+<div class="cart-drawer-container">
+    <!-- Header: Register title & Customer selection -->
+    <div class="cart-header">
+        <div class="cart-header-title">
+            <span class="cart-icon">🧾</span>
+            <h2 data-bind="text: $component.nls.Cart.Title"></h2>
+            <span class="cart-badge-count" data-bind="text: $component.totalQuantity"></span>
+            
+            <!-- ko if: $component.rootModel && $component.rootModel.heldOrders().length > 0 -->
+            <button class="held-orders-header-badge"
+                    data-bind="click: $component.openHeldOrdersModal"
+                    title="View Parked / Held Orders">
+                <span class="pulse-dot"></span>
+                <span>⏸️ Parked (</span><strong data-bind="text: $component.rootModel.heldOrders().length"></strong><span>)</span>
+            </button>
+            <!-- /ko -->
+        </div>
+        <div class="customer-select-box">
+            <label class="customer-label">👤 Customer:</label>
+            <input type="text"
+                   class="customer-input"
+                   list="registeredCustomersList"
+                   data-bind="value: $component.customerName"
+                   placeholder="Walk-in Customer or search/add name..." />
+            <datalist id="registeredCustomersList">
+                <option value="Walk-in Customer">Walk-in Customer</option>
+                <!-- ko foreach: $component.registeredCustomers -->
+                <option data-bind="value: name, text: name + ' (' + phone + ' • ' + tier + ')'"></option>
+                <!-- /ko -->
+            </datalist>
+        </div>
+    </div>
+
+    <!-- Body: Empty State or Cart Items Table -->
+    <div class="cart-body">
+        <!-- ko if: $component.cart().length === 0 -->
+        <div class="empty-cart-view">
+            <div class="empty-cart-icon">🛒</div>
+            <h3 data-bind="text: $component.nls.Cart.EmptyCartMessage"></h3>
+            <p data-bind="text: $component.nls.Cart.EmptyCartSubMessage"></p>
+        </div>
+        <!-- /ko -->
+
+        <!-- ko if: $component.cart().length > 0 -->
+        <div class="cart-items-scroll">
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th class="col-item" data-bind="text: $component.nls.Cart.Item"></th>
+                        <th class="col-qty text-center" data-bind="text: $component.nls.Cart.Qty"></th>
+                        <th class="col-price text-right" data-bind="text: $component.nls.Cart.Price"></th>
+                        <th class="col-total text-right" data-bind="text: $component.nls.Cart.Total"></th>
+                        <th class="col-action"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- ko foreach: $component.cart -->
+                    <tr class="cart-row">
+                        <!-- Item Details -->
+                        <td class="col-item">
+                            <div class="cart-item-info">
+                                <span class="cart-item-icon" data-bind="text: icon"></span>
+                                <div class="cart-item-names">
+                                    <strong class="cart-item-name" data-bind="text: name"></strong>
+                                    <span class="cart-item-sku" data-bind="text: sku"></span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Quantity Stepper -->
+                        <td class="col-qty text-center">
+                            <div class="qty-stepper">
+                                <button class="qty-btn dec-btn"
+                                        data-bind="click: decrement"
+                                        title="Decrease Quantity">−</button>
+                                <input type="number"
+                                       class="qty-input"
+                                       data-bind="value: quantity, numericOnly: true"
+                                       min="1" />
+                                <button class="qty-btn inc-btn"
+                                        data-bind="click: increment, enable: quantity() < maxStock"
+                                        title="Increase Quantity">＋</button>
+                            </div>
+                        </td>
+
+                        <!-- Unit Price -->
+                        <td class="col-price text-right">
+                            <span data-bind="currency: unitPrice"></span>
+                        </td>
+
+                        <!-- Line Total (Computed) -->
+                        <td class="col-total text-right">
+                            <span class="line-total-amount" data-bind="currency: lineTotal, pulseOnChange: lineTotal"></span>
+                        </td>
+
+                        <!-- Remove Row -->
+                        <td class="col-action text-center">
+                            <button class="remove-item-btn"
+                                    data-bind="click: function() { $component.removeItem($data); }"
+                                    title="Remove from cart">🗑️</button>
+                        </td>
+                    </tr>
+                    <!-- /ko -->
+                </tbody>
+            </table>
+        </div>
+        <!-- /ko -->
+    </div>
+
+    <!-- Footer: Voucher Input & Live Financial Computations -->
+    <div class="cart-footer">
+        <!-- Voucher Promo Code -->
+        <div class="voucher-box">
+            <div class="voucher-input-group">
+                <input type="text"
+                       class="voucher-input"
+                       data-bind="textInput: $component.voucherCode"
+                       placeholder="Promo (SAVE10, VIP20)" />
+                <button class="apply-voucher-btn"
+                        data-bind="click: $component.applyVoucher, text: $component.nls.Cart.ApplyVoucher"></button>
+            </div>
+            <!-- ko if: $component.voucherFeedback() -->
+            <div class="voucher-message"
+                 data-bind="text: $component.voucherFeedback().text,
+                            css: { 'is-success': $component.voucherFeedback().type === 'success', 'is-error': $component.voucherFeedback().type === 'error' }">
+            </div>
+            <!-- /ko -->
+        </div>
+
+        <!-- Real-time Financial Breakdown -->
+        <div class="invoice-summary">
+            <div class="summary-line">
+                <span class="summary-label" data-bind="text: $component.nls.Cart.Subtotal"></span>
+                <span class="summary-value" data-bind="currency: $component.subTotal"></span>
+            </div>
+
+            <!-- ko if: $component.voucherDiscountAmount() > 0 -->
+            <div class="summary-line discount-line">
+                <span class="summary-label">
+                    <span data-bind="text: $component.nls.Cart.Discount"></span>
+                    <small data-bind="text: '(' + $component.voucherDiscountPercent() + '%)'"></small>
+                </span>
+                <span class="summary-value negative-val" data-bind="text: '-' + $component.baseModel.formatCurrency($component.voucherDiscountAmount())"></span>
+            </div>
+            <!-- /ko -->
+
+            <div class="summary-line">
+                <span class="summary-label" data-bind="text: $component.nls.Cart.TaxVAT"></span>
+                <span class="summary-value" data-bind="currency: $component.taxAmount"></span>
+            </div>
+
+            <div class="summary-line grand-total-line">
+                <span class="summary-label" data-bind="text: $component.nls.Cart.GrandTotal"></span>
+                <span class="grand-total-value" data-bind="currency: $component.grandTotal, pulseOnChange: $component.grandTotal"></span>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="cart-actions-grid" data-bind="css: { 'has-parked': $component.rootModel && $component.rootModel.heldOrders().length > 0 }">
+            <button class="cart-btn clear-cart-btn"
+                    data-bind="click: $component.clearCart, enable: $component.cart().length > 0"
+                    title="Clear current cart">
+                <span>✕ Clear</span>
+            </button>
+            <button class="cart-btn hold-cart-btn"
+                    data-bind="click: $component.holdOrder, enable: $component.cart().length > 0"
+                    title="Put active order on hold">
+                <span>⏸ Hold</span>
+            </button>
+            <!-- ko if: $component.rootModel && $component.rootModel.heldOrders().length > 0 -->
+            <button class="cart-btn parked-cart-btn"
+                    data-bind="click: $component.openHeldOrdersModal"
+                    title="View & Restore Parked Orders">
+                <span>📋 (<strong data-bind="text: $component.rootModel.heldOrders().length"></strong>) Parked</span>
+            </button>
+            <!-- /ko -->
+            <button class="cart-btn checkout-btn"
+                    data-bind="click: $component.proceedToCheckout, enable: $component.cart().length > 0"
+                    title="Proceed to Payment">
+                <span>💳 Pay Now</span>
+            </button>
+        </div>
+    </div>
+</div>
